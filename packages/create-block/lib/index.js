@@ -150,18 +150,24 @@ program
 
 					const filterOptionsProvided = ( { name } ) =>
 						! Object.keys( optionsValues ).includes( name );
-					const blockPrompts = getPrompts(
-						pluginTemplate,
-						[
-							'slug',
-							'namespace',
-							'title',
-							'description',
-							'dashicon',
-							'category',
-						],
-						variant
-					).filter( filterOptionsProvided );
+					const blockPrompts = [
+						// Get built-in block prompts
+						...getPrompts(
+							pluginTemplate,
+							[
+								'slug',
+								'namespace',
+								'title',
+								'description',
+								'dashicon',
+								'category',
+							],
+							variant
+						),
+						// Get custom prompts
+						...getPrompts(pluginTemplate, null, variant)
+					].filter( filterOptionsProvided );
+
 					const blockAnswers = await inquirer.prompt( blockPrompts );
 
 					const pluginAnswers = plugin

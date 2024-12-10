@@ -124,10 +124,22 @@ const configToTemplate = async ( {
 	assetsPath,
 	defaultValues = {},
 	variants = {},
+	customPrompts = {},
 	...deprecated
 } ) => {
 	if ( defaultValues === null || typeof defaultValues !== 'object' ) {
 		throw new CLIError( 'Template found but invalid definition provided.' );
+	}
+
+	if (customPrompts !== null && typeof customPrompts !== 'object') {
+		throw new CLIError( 'Invalid custom prompts definition provided.' );
+	}
+
+	// Validate custom prompts format
+	for (const [name, prompt] of Object.entries(customPrompts)) {
+		if (!prompt.type || !prompt.name || !prompt.message) {
+			throw new CLIError(`Invalid custom prompt "${name}". Each prompt must have type, name, and message properties.`);
+		}
 	}
 
 	if ( deprecated.templatesPath ) {
@@ -154,6 +166,7 @@ const configToTemplate = async ( {
 		outputAssets: assetsPath ? await getOutputAssets( assetsPath ) : {},
 		defaultValues,
 		variants,
+		customPrompts,
 	};
 };
 
@@ -251,12 +264,27 @@ const getDefaultValues = ( pluginTemplate, variant ) => {
 
 const getPrompts = ( pluginTemplate, keys, variant ) => {
 	const defaultValues = getDefaultValues( pluginTemplate, variant );
-	return keys.map( ( promptName ) => {
+	
+	// Get built-in prompts if keys are provided
+	const builtInPrompts = keys ? keys.map( ( promptName ) => {
 		return {
 			...prompts[ promptName ],
 			default: defaultValues[ promptName ],
 		};
-	} );
+	}) : [];
+
+	// Add custom prompts if they exist
+	const customPromptsList = [];
+	if (pluginTemplate.customPrompts) {
+		for (const [name, prompt] of Object.entries(pluginTemplate.customPrompts)) {
+			customPromptsList.push({
+				...prompt,
+				default: defaultValues[name],
+			});
+		}
+	}
+
+	return [...builtInPrompts, ...customPromptsList];
 };
 
 const getVariantVars = ( variants, variant ) => {
