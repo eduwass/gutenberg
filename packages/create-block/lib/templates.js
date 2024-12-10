@@ -238,6 +238,14 @@ const getPluginTemplate = async ( templateName ) => {
 };
 
 const getDefaultValues = ( pluginTemplate, variant ) => {
+	// Get custom prompt default values
+	const customPromptDefaults = {};
+	if (pluginTemplate.customPrompts) {
+		for (const [name, prompt] of Object.entries(pluginTemplate.customPrompts)) {
+			customPromptDefaults[name] = prompt.default || '';
+		}
+	}
+
 	return {
 		$schema: 'https://schemas.wp.org/trunk/block.json',
 		apiVersion: 3,
@@ -256,6 +264,7 @@ const getDefaultValues = ( pluginTemplate, variant ) => {
 		editorStyle: 'file:./index.css',
 		style: 'file:./style-index.css',
 		transformer: ( view ) => view,
+		...customPromptDefaults,
 		...pluginTemplate.defaultValues,
 		...pluginTemplate.variants?.[ variant ],
 		variantVars: getVariantVars( pluginTemplate.variants, variant ),
@@ -264,27 +273,29 @@ const getDefaultValues = ( pluginTemplate, variant ) => {
 
 const getPrompts = ( pluginTemplate, keys, variant ) => {
 	const defaultValues = getDefaultValues( pluginTemplate, variant );
-	
-	// Get built-in prompts if keys are provided
-	const builtInPrompts = keys ? keys.map( ( promptName ) => {
-		return {
-			...prompts[ promptName ],
-			default: defaultValues[ promptName ],
-		};
-	}) : [];
+	let allPrompts = [];
 
-	// Add custom prompts if they exist
-	const customPromptsList = [];
-	if (pluginTemplate.customPrompts) {
-		for (const [name, prompt] of Object.entries(pluginTemplate.customPrompts)) {
-			customPromptsList.push({
-				...prompt,
-				default: defaultValues[name],
-			});
+	// Add built-in prompts if keys are provided
+	if (keys && keys.length > 0) {
+		for (const key of keys) {
+			// If it's a built-in prompt
+			if (prompts[key]) {
+				allPrompts.push({
+					...prompts[key],
+					default: defaultValues[key],
+				});
+			}
+			// If it's a custom prompt
+			else if (pluginTemplate.customPrompts?.[key]) {
+				allPrompts.push({
+					...pluginTemplate.customPrompts[key],
+					default: defaultValues[key] || pluginTemplate.customPrompts[key].default || '',
+				});
+			}
 		}
 	}
 
-	return [...builtInPrompts, ...customPromptsList];
+	return allPrompts;
 };
 
 const getVariantVars = ( variants, variant ) => {

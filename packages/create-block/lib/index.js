@@ -150,23 +150,21 @@ program
 
 					const filterOptionsProvided = ( { name } ) =>
 						! Object.keys( optionsValues ).includes( name );
-					const blockPrompts = [
-						// Get built-in block prompts
-						...getPrompts(
-							pluginTemplate,
-							[
-								'slug',
-								'namespace',
-								'title',
-								'description',
-								'dashicon',
-								'category',
-							],
-							variant
-						),
-						// Get custom prompts
-						...getPrompts(pluginTemplate, null, variant)
-					].filter( filterOptionsProvided );
+
+					// Get all prompts in one call
+					const blockPrompts = getPrompts(
+						pluginTemplate,
+						[
+							'slug',
+							'namespace',
+							'title',
+							'description',
+							'dashicon',
+							'category',
+							...(pluginTemplate.customPrompts ? Object.keys(pluginTemplate.customPrompts) : [])
+						],
+						variant
+					).filter( filterOptionsProvided );
 
 					const blockAnswers = await inquirer.prompt( blockPrompts );
 
@@ -195,6 +193,7 @@ program
 											'domainPath',
 											'updateURI',
 										],
+										...(pluginTemplate.customPrompts ? Object.keys(pluginTemplate.customPrompts) : []),
 										variant
 									).filter( filterOptionsProvided );
 									const result =

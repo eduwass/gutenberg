@@ -54,6 +54,7 @@ module.exports = async (
 		customBlockJSON,
 		example,
 		transformer,
+		...customPromptValues
 	}
 ) => {
 	slug = slug.toLowerCase();
@@ -97,6 +98,7 @@ module.exports = async (
 		example,
 		textdomain: slug,
 		rootDirectory,
+		...customPromptValues
 	} );
 
 	const view = {
