@@ -131,14 +131,14 @@ const configToTemplate = async ( {
 		throw new CLIError( 'Template found but invalid definition provided.' );
 	}
 
-	if (customPrompts !== null && typeof customPrompts !== 'object') {
+	if ( customPrompts !== null && typeof customPrompts !== 'object' ) {
 		throw new CLIError( 'Invalid custom prompts definition provided.' );
 	}
 
 	// Validate custom prompts format
-	for (const [name, prompt] of Object.entries(customPrompts)) {
-		if (!prompt.type || !prompt.name || !prompt.message) {
-			throw new CLIError(`Invalid custom prompt "${name}". Each prompt must have type, name, and message properties.`);
+	for ( const [name, prompt] of Object.entries( customPrompts ) ) {
+		if ( ! prompt.type || ! prompt.name || ! prompt.message ) {
+			throw new CLIError( `Invalid custom prompt "${name}". Each prompt must have type, name, and message properties.` );
 		}
 	}
 
@@ -240,9 +240,9 @@ const getPluginTemplate = async ( templateName ) => {
 const getDefaultValues = ( pluginTemplate, variant ) => {
 	// Get custom prompt default values
 	const customPromptDefaults = {};
-	if (pluginTemplate.customPrompts) {
-		for (const [name, prompt] of Object.entries(pluginTemplate.customPrompts)) {
-			customPromptDefaults[name] = prompt.default || '';
+	if ( pluginTemplate.customPrompts ) {
+		for ( const [ name, prompt ] of Object.entries( pluginTemplate.customPrompts ) ) {
+			customPromptDefaults[ name ] = prompt.default || '';
 		}
 	}
 
@@ -276,20 +276,20 @@ const getPrompts = ( pluginTemplate, keys, variant ) => {
 	let allPrompts = [];
 
 	// Add built-in prompts if keys are provided
-	if (keys && keys.length > 0) {
-		for (const key of keys) {
+	if ( keys && keys.length > 0 ) {
+		for ( const key of keys ) {
 			// If it's a built-in prompt
-			if (prompts[key]) {
-				allPrompts.push({
-					...prompts[key],
-					default: defaultValues[key],
+			if ( prompts[ key ] ) {
+				allPrompts.push( {
+					...prompts[ key ],
+					default: defaultValues[ key ],
 				});
 			}
 			// If it's a custom prompt
-			else if (pluginTemplate.customPrompts?.[key]) {
-				allPrompts.push({
-					...pluginTemplate.customPrompts[key],
-					default: defaultValues[key] || pluginTemplate.customPrompts[key].default || '',
+			else if ( pluginTemplate.customPrompts?.[ key ] ) {
+				allPrompts.push( {
+					...pluginTemplate.customPrompts[ key ],
+					default: defaultValues[ key ] || pluginTemplate.customPrompts[ key ].default || '',
 				});
 			}
 		}

@@ -161,7 +161,7 @@ program
 							'description',
 							'dashicon',
 							'category',
-							...(pluginTemplate.customPrompts ? Object.keys(pluginTemplate.customPrompts) : [])
+							...( pluginTemplate.customPrompts ? Object.keys( pluginTemplate.customPrompts ) : [] )
 						],
 						variant
 					).filter( filterOptionsProvided );
@@ -193,7 +193,7 @@ program
 											'domainPath',
 											'updateURI',
 										],
-										...(pluginTemplate.customPrompts ? Object.keys(pluginTemplate.customPrompts) : []),
+										...( pluginTemplate.customPrompts ? Object.keys( pluginTemplate.customPrompts ) : [] ),
 										variant
 									).filter( filterOptionsProvided );
 									const result =
